@@ -55,7 +55,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformats-binary</artifactId>
+			<artifactId>jackson-dataformat-protobuf</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.jopt-simple</groupId>
@@ -100,7 +100,7 @@
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.dataformat</groupId>
-				<artifactId>jackson-dataformats-binary</artifactId>
+				<artifactId>jackson-dataformat-protobuf</artifactId>
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
