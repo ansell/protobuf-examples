@@ -69,6 +69,10 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.github.ansell.csv.sum</groupId>
+			<artifactId>csvsum</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -136,6 +140,11 @@
 				<artifactId>slf4j-simple</artifactId>
 				<version>${slf4j.version}</version>
 				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.github.ansell.csv.sum</groupId>
+				<artifactId>csvsum</artifactId>
+				<version>0.3.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

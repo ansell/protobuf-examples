@@ -16,6 +16,7 @@
 package com.github.ansell.protobuf;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -25,8 +26,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SequenceWriter;
+import com.fasterxml.jackson.dataformat.protobuf.ProtobufMapper;
 import com.fasterxml.jackson.dataformat.protobuf.schema.ProtobufSchema;
 import com.fasterxml.jackson.dataformat.protobuf.schema.ProtobufSchemaLoader;
+import com.github.ansell.csv.util.CSVUtil;
 
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
@@ -89,13 +95,34 @@ public class ProtobufReader {
 			throw new FileNotFoundException("Output path already exists: " + outputPath.toString());
 		}
 
-		try (final BufferedReader readerMapping = Files.newBufferedReader(schemaPath);) {
-			String schemaString = Files.readAllLines(schemaPath).stream().collect(Collectors.joining("\n"));
-			ProtobufSchema schemaObject = ProtobufSchemaLoader.std.parse(schemaString);
+		try (final BufferedReader schemaReader = Files.newBufferedReader(schemaPath);) {
+			ProtobufSchema schemaObject = ProtobufSchemaLoader.std.load(schemaReader);
 			try (final InputStream inputProtobuf = Files.newInputStream(inputPath);
-					final OutputStream outputStream = Files.newOutputStream(outputPath);)
+					final BufferedWriter outputStream = Files.newBufferedWriter(outputPath);)
 			{
 
+				ObjectMapper mapper = new ProtobufMapper();
+				final MappingIterator<List<String>> it = mapper.readerFor(List.class).with(
+						schemaObject).readValues(inputProtobuf);
+				List<String> header = null;
+				SequenceWriter csvWriter = null;
+				try {
+					while (it.hasNext()) {
+						List<String> nextLine = it.next();
+						if (header == null) {
+							header = nextLine;
+							csvWriter = CSVUtil.newCSVWriter(outputStream, header);
+						}
+						else {
+							csvWriter.write(nextLine);
+						}
+					}
+				}
+				finally {
+					if (csvWriter != null) {
+						csvWriter.close();
+					}
+				}
 			}
 		}
 
